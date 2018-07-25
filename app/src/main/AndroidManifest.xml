@@ -18,7 +18,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".MainActivity"
-            android:screenOrientation="portrait"></activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".Main2Activity"
             android:label="Bender"
@@ -29,7 +29,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".NewNoteActivity"></activity>
+        <activity android:name=".NewNoteActivity" />
+        <activity android:name=".ViewAddPhoto"></activity>
     </application>
 
 </manifest>

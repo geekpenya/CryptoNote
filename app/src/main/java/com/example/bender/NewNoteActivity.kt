@@ -19,6 +19,8 @@ class NewNoteActivity : AppCompatActivity() {
     lateinit var BD: SQLiteDatabase
     val BD_NAME = "NoteBD"
     val GALLERY_REQUST = 1
+    var uribox = ArrayList<Uri>()
+    var photoCount = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,7 +38,10 @@ class NewNoteActivity : AppCompatActivity() {
         super.onActivityResult(requestCode, resultCode, imageReturn)
             try {
                 val selectImg = imageReturn?.data as Uri
-                previewImg.setImageURI(selectImg)
+                uribox.add(selectImg)
+                photoCount++
+                photoCountText.setText("$photoCount Фото добавленно")
+
             }
             catch (e: IOException) {
                 e.printStackTrace()
@@ -48,7 +53,7 @@ class NewNoteActivity : AppCompatActivity() {
     }
 
     private fun saveImg() {
-        var byte = getBitmapByte(previewImg.drawable as Bitmap)
+
 
     }
 
@@ -56,6 +61,12 @@ class NewNoteActivity : AppCompatActivity() {
         val outputstream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 0, outputstream )
         return outputstream.toByteArray()
+    }
+
+    fun viewPhoto(view: View) {
+        val viewPhoto = Intent(this, ViewAddPhoto::class.java)
+        viewPhoto.putExtra("photoList", uribox)
+        startActivity(viewPhoto)
     }
 
 
