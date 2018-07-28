@@ -30,7 +30,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".NewNoteActivity" />
-        <activity android:name=".ViewAddPhoto"></activity>
+        <activity android:name=".ViewAddPhoto" />
+        <activity android:name=".NoteViewActivity"></activity>
     </application>
 
 </manifest>

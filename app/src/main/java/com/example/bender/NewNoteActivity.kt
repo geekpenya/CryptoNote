@@ -10,6 +10,7 @@ import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
+import android.support.v4.content.ContextCompat.startActivity
 import android.view.View
 
 import kotlinx.android.synthetic.main.activity_new_note.*
@@ -56,6 +57,7 @@ class NewNoteActivity : AppCompatActivity() {
         val value = ContentValues()
         value.put("title", title)
         value.put("text", note)
+        value.put("photo", getidfromBD(BD).inc())
         BD.insert("Note", null, value)
         value.clear()
        // BD.execSQL("INSERT INTO Note (title, text) VALUES ($title, $note);")
@@ -63,7 +65,7 @@ class NewNoteActivity : AppCompatActivity() {
         val id = getidfromBD(BD)
         for (i in uribox) {
             val bytePhoto = getBitmapByte(i)
-            value.put("id", id)
+            value.put("note", id)
             value.put("photo", bytePhoto)
             BD.insert("Photo", null, value)
             value.clear()
@@ -77,20 +79,10 @@ class NewNoteActivity : AppCompatActivity() {
 
 
     private fun getBitmapByte(uriPhoto: Uri):ByteArray {
-        var uriString = uriPhoto.toString().toUpperCase()
-        var typePhto = 0
-        if (uriString.contains("JPEG") || uriString.contains("JPG"))
-            typePhto = 1
-        if (uriString.contains("PNG"))
-            typePhto = 2
-
         val outputstream = ByteArrayOutputStream()
         val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, uriPhoto)
 
-        when (typePhto) {
-            1 -> bitmap.compress(Bitmap.CompressFormat.JPEG, 0, outputstream )
-            2 -> bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputstream )
-        }
+        bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputstream )
 
         return outputstream.toByteArray()
     }
@@ -104,7 +96,7 @@ class NewNoteActivity : AppCompatActivity() {
     companion object {
 
         fun getidfromBD(BD: SQLiteDatabase): Int {
-            val query = "SELECT photo FROM Note ORDER BY photo DESC LIMIT 1"
+            val query = "SELECT photo FROM Note ORDER BY photo DESC"
             val cursor = BD.rawQuery(query, null)
             val id = cursor.count
             cursor.close()

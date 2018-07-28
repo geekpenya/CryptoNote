@@ -1,5 +1,6 @@
 package com.example.bender
 
+import android.graphics.Bitmap
 import android.net.Uri
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -9,7 +10,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.example.bender.R.id.textView
 
-class PhotoViewAdapter(var uribox: ArrayList<Uri>): RecyclerView.Adapter<PhotoViewAdapter.ViewHolder>() {
+class PhotoViewAdapter<T>(var uribox: ArrayList<T>): RecyclerView.Adapter<PhotoViewAdapter.ViewHolder>() {
 
     override fun getItemCount() = uribox.size
 
@@ -19,7 +20,13 @@ class PhotoViewAdapter(var uribox: ArrayList<Uri>): RecyclerView.Adapter<PhotoVi
     }
 
     override fun onBindViewHolder(p0: PhotoViewAdapter.ViewHolder, p1: Int) {
-        p0?.photoView?.setImageURI( uribox[p1])
+        if (uribox[p1] is Uri) {
+            p0.photoView!!.setImageURI( uribox[p1] as Uri)
+        }
+        if (uribox[p1] is Bitmap) {
+            p0.photoView!!.setImageBitmap(uribox[p1] as Bitmap)
+        }
+
     }
 
     class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {

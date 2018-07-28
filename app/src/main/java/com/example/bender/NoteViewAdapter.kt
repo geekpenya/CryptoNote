@@ -1,7 +1,11 @@
 package com.example.bender
 
+import android.app.Activity
 import android.app.Person
+import android.content.Context
+import android.content.Intent
 import android.nfc.Tag
+import android.support.v4.content.ContextCompat.startActivity
 import android.support.v7.view.menu.ActionMenuItemView
 import android.support.v7.widget.RecyclerView
 import android.util.Log
@@ -11,7 +15,7 @@ import android.view.ViewGroup
 import android.widget.*
 import kotlin.coroutines.experimental.coroutineContext
 
-class NoteViewAdapter (var titlebox: ArrayList<String>): RecyclerView.Adapter<NoteViewAdapter.ViewHolder>() {
+class NoteViewAdapter (var titlebox: ArrayList<String>, var context: Context): RecyclerView.Adapter<NoteViewAdapter.ViewHolder>() {
 
     override fun getItemCount() = titlebox.size
 
@@ -23,21 +27,24 @@ class NoteViewAdapter (var titlebox: ArrayList<String>): RecyclerView.Adapter<No
     }
 
     override fun onBindViewHolder(p0: ViewHolder, p1: Int) {
+        p0.textView!!.setOnClickListener({
+            var title = titlebox[p1]
+            val noteView = Intent(context, NoteViewActivity::class.java)
+            noteView.putExtra("Title", title)
+            context.startActivity(noteView)
+
+        })
         p0?.textView?.text = titlebox[p1]
+
 
 
     }
 
 
-  class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView)  {
+    class ViewHolder(itemView: View): RecyclerView.ViewHolder(itemView)  {
       var textView: TextView? = null
       init {
-          itemView.setOnClickListener {v: View ->
-              var pos = adapterPosition
-              print(pos)
-
-          }
-          textView = itemView?.findViewById(R.id.text_list_item)
+         textView = itemView?.findViewById(R.id.text_list_item)
       }
 
 

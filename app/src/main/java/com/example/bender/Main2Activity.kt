@@ -54,12 +54,14 @@ class Main2Activity : AppCompatActivity() {
 
         val query = "SELECT title FROM Note"
         val cursor = BD.rawQuery(query, null)
-        cursor.moveToFirst()
+       if(cursor.moveToFirst()){
+        titlebox.add(cursor.getString(cursor.getColumnIndex("title")))
         while (cursor.moveToNext()) {
             titlebox.add(cursor.getString(cursor.getColumnIndex("title")))
 
         }
         cursor.close()
+       }
         return titlebox
     }
 
@@ -71,11 +73,12 @@ class Main2Activity : AppCompatActivity() {
     fun loadNoteTitle() {
         BD = openOrCreateDatabase(BD_NAME, Context.MODE_PRIVATE, null)
 
-
-
         NoteView.layoutManager = LinearLayoutManager(this)
-        NoteView.adapter = NoteViewAdapter(getTitleNote())
+        NoteView.adapter = NoteViewAdapter(getTitleNote(), this)
     }
+
+
+
 }
 
 
