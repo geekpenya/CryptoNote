@@ -1,7 +1,9 @@
 package com.example.bender
 
 import android.Manifest.permission.READ_PHONE_STATE
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.database.sqlite.SQLiteDatabase
@@ -12,6 +14,7 @@ import android.support.v4.content.ContextCompat
 import android.support.v4.hardware.fingerprint.FingerprintManagerCompat
 import android.view.View
 import android.widget.Toast
+import com.example.bender.R.id.editText
 import kotlinx.android.synthetic.main.activity_main.*
 import java.security.*
 
@@ -40,15 +43,13 @@ class MainActivity : AppCompatActivity() {
             ActivityCompat.requestPermissions(this, arrayOf(READ_PHONE_STATE), 0)
         }
 
-        var hasVis: Boolean = sp.getBoolean("hasVis", false)
+        val hasVis: Boolean = sp.getBoolean("hasVis", false)
         if(!hasVis) {
             textView.text = "Задать PIN-Код"
             val e: SharedPreferences.Editor = sp.edit()
             e.putBoolean("hasVis", true)
             e.apply()
-            BD = openOrCreateDatabase(BD_NAME, Context.MODE_PRIVATE, null)
-            BD.execSQL("CREATE TABLE IF NOT EXISTS Note (titel VARCHAR, text VAECHAR, photo BLOB)")
-            BD.close()
+
         }
 
         else {
@@ -101,14 +102,16 @@ class MainActivity : AppCompatActivity() {
         if (!typeLogin) {
             prepearLogin()
             Toast.makeText(this, "PIN-Код сохранен", Toast.LENGTH_SHORT).show()
-            finish()
+            createBD()
+            finLogin()
         }
 
         else {
+            createBD()
             val pinUser = hash(editText.text.toString())
             val pinBase = sp.getString(PIN, "")
             if (pinBase == pinUser)
-                finish()
+                finLogin()
             else
                 Toast.makeText(this, "PIN-Код не верен", Toast.LENGTH_SHORT).show()
         }
@@ -121,10 +124,26 @@ class MainActivity : AppCompatActivity() {
         return digest.fold("", { str, it -> str + "%02x".format(it) })
     }
 
+    private fun createBD() {
+        BD = openOrCreateDatabase(BD_NAME, Context.MODE_PRIVATE, null)
+        BD.execSQL("CREATE TABLE IF NOT EXISTS Note (title VARCHAR(50), text VARCHAR(500), photo INT PRIMARY KEY)")
+        BD.execSQL("CREATE TABLE IF NOT EXISTS Photo (Note INT, photo BLOB )")
+        BD.close()
+    }
+
 
 
     @Override
     override fun onBackPressed() {}
+
+
+
+    private fun finLogin() {
+        val intent = Intent()
+        intent.putExtra("login", true)
+        setResult(Activity.RESULT_OK, intent)
+        finish()
+    }
 
 
 

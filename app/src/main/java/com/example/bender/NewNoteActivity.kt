@@ -1,6 +1,7 @@
 package com.example.bender
 
 import android.app.Activity
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.database.sqlite.SQLiteDatabase
@@ -10,6 +11,7 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
+
 import kotlinx.android.synthetic.main.activity_new_note.*
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -49,17 +51,47 @@ class NewNoteActivity : AppCompatActivity() {
         }
 
     fun butSave (view: View) {
+        val title = titleText.text.toString()
+        val note = noteText.text.toString()
+        val value = ContentValues()
+        value.put("title", title)
+        value.put("text", note)
+        BD.insert("Note", null, value)
+        value.clear()
+       // BD.execSQL("INSERT INTO Note (title, text) VALUES ($title, $note);")
+
+        val id = getidfromBD(BD)
+        for (i in uribox) {
+            val bytePhoto = getBitmapByte(i)
+            value.put("id", id)
+            value.put("photo", bytePhoto)
+            BD.insert("Photo", null, value)
+            value.clear()
+        }
+
+        BD.close()
+        finish()
+
 
     }
 
-    private fun saveImg() {
 
+    private fun getBitmapByte(uriPhoto: Uri):ByteArray {
+        var uriString = uriPhoto.toString().toUpperCase()
+        var typePhto = 0
+        if (uriString.contains("JPEG") || uriString.contains("JPG"))
+            typePhto = 1
+        if (uriString.contains("PNG"))
+            typePhto = 2
 
-    }
-
-    private fun getBitmapByte(bitmap: Bitmap):ByteArray {
         val outputstream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 0, outputstream )
+        val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, uriPhoto)
+
+        when (typePhto) {
+            1 -> bitmap.compress(Bitmap.CompressFormat.JPEG, 0, outputstream )
+            2 -> bitmap.compress(Bitmap.CompressFormat.PNG, 0, outputstream )
+        }
+
         return outputstream.toByteArray()
     }
 
@@ -67,6 +99,17 @@ class NewNoteActivity : AppCompatActivity() {
         val viewPhoto = Intent(this, ViewAddPhoto::class.java)
         viewPhoto.putExtra("photoList", uribox)
         startActivity(viewPhoto)
+    }
+
+    companion object {
+
+        fun getidfromBD(BD: SQLiteDatabase): Int {
+            val query = "SELECT photo FROM Note ORDER BY photo DESC LIMIT 1"
+            val cursor = BD.rawQuery(query, null)
+            val id = cursor.count
+            cursor.close()
+            return id
+        }
     }
 
 
